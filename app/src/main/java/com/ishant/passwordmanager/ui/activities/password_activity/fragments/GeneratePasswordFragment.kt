@@ -15,14 +15,10 @@ import nu.aaro.gustav.passwordstrengthmeter.PasswordStrengthCalculator
 import java.util.*
 
 class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentGeneratePasswordBinding.bind(view)
-
         var passwordLength = 13
-
-
         binding.passwordInputMeter.setPasswordStrengthCalculator(object :
             PasswordStrengthCalculator {
             override fun calculatePasswordSecurityLevel(password: String?): Int {
@@ -32,42 +28,29 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
                     return 0
                 }
             }
-
             override fun getMinimumLength(): Int {
                 return 1
             }
-
             override fun passwordAccepted(level: Int): Boolean {
                 return true
             }
-
             override fun onPasswordAccepted(password: String?) {
-
             }
         })
-
         val generatedPassword = generatePassword(passwordLength,
             includeUpperCaseLetters = binding.cbUppercase.isChecked,
             includeLowerCaseLetters = binding.cbLowercase.isChecked,
             includeSymbols = binding.cbSymbols.isChecked,
             includeNumbers = binding.cbNumbers.isChecked)
-
         binding.passwordInputMeter.setEditText(binding.etGeneratedPassword)
         binding.etGeneratedPassword.setText(generatedPassword)
-
         binding.sliderPasswordStrength.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
-
             }
-
             override fun onStopTrackingTouch(slider: Slider) {
                 passwordLength = slider.value.toInt()
             }
-
-
-
         })
-
         binding.sliderPasswordStrength.addOnChangeListener(object: Slider.OnChangeListener{
             override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
                 slider.setLabelFormatter(LabelFormatter { it ->
@@ -75,17 +58,12 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
                 })
             }
         })
-
-
-
         binding.btnGeneratePassword.setOnClickListener {
-
             val generatedPassword = generatePassword(passwordLength,
                 includeUpperCaseLetters = binding.cbUppercase.isChecked,
                 includeLowerCaseLetters = binding.cbLowercase.isChecked,
                 includeSymbols = binding.cbSymbols.isChecked,
                 includeNumbers = binding.cbNumbers.isChecked)
-
             if(generatedPassword.isBlank()) {
                 if(passwordLength==0) {
                     Snackbar.make(view,"Password length cannot be zero",Snackbar.LENGTH_SHORT).show()
@@ -97,7 +75,6 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
                 binding.etGeneratedPassword.setText(generatedPassword)
             }
         }
-
         binding.btnCopyPassword.setOnClickListener {
             val clipboard: ClipboardManager? = ContextCompat.getSystemService(
                 requireContext(),
@@ -107,14 +84,6 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
             clipboard?.setPrimaryClip(clip)
             Snackbar.make(view, "Password Copied to Clipboard", Snackbar.LENGTH_SHORT).show()
         }
-
-
-
-
-
-
-
-
     }
 
     private fun getPasswordScore(password: String): Int {
@@ -152,7 +121,6 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
                 list.add(2)
             if(includeSymbols)
                 list.add(3)
-
             for(i in 1..length){
                 when(list.toMutableList().mRandom()){
                     0-> password += ('A'..'Z').toMutableList().mRandom().toString()
@@ -163,5 +131,4 @@ class GeneratePasswordFragment : Fragment(R.layout.fragment_generate_password) {
             }
             return password
         }
-
 }

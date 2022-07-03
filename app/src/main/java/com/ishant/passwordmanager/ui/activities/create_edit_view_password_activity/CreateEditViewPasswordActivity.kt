@@ -18,33 +18,22 @@ import com.ishant.passwordmanager.ui.factories.CreateEditViewPasswordViewModelPr
 import com.ishant.passwordmanager.ui.viewmodels.CreateEditViewPasswordViewModel
 
 class CreateEditViewPasswordActivity : AppCompatActivity() {
-
     lateinit var binding: ActivityCreateEditViewPasswordBinding
     lateinit var viewModel: CreateEditViewPasswordViewModel
-
     lateinit var command: String
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-
         val database = PasswordManagerDatabase(this)
         val repository = PasswordManagerRepository(database)
         val factory = CreateEditViewPasswordViewModelProviderFactory(repository)
         viewModel = ViewModelProvider(this,factory).get(CreateEditViewPasswordViewModel::class.java)
-
         binding = ActivityCreateEditViewPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-
         command = intent?.getStringExtra("command").toString()
         val data = intent?.getSerializableExtra("data")
-
-
-
         if(command=="view") {
             val bundle = Bundle().apply {
                 putSerializable("data",data)
@@ -52,7 +41,6 @@ class CreateEditViewPasswordActivity : AppCompatActivity() {
             findNavController(R.id.fragment2).popBackStack()
             findNavController(R.id.fragment2).navigate(R.id.viewPasswordsFragment,bundle)
         }
-
         if(command=="edit") {
             val bundle = Bundle().apply {
                 putSerializable("data",data)
@@ -60,7 +48,6 @@ class CreateEditViewPasswordActivity : AppCompatActivity() {
             findNavController(R.id.fragment2).popBackStack()
             findNavController(R.id.fragment2).navigate(R.id.editPasswordFragment,bundle)
         }
-
     }
 
     override fun onBackPressed() {
@@ -69,5 +56,4 @@ class CreateEditViewPasswordActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
 }

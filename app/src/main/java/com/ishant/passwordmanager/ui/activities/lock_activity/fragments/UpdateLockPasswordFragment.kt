@@ -14,20 +14,14 @@ import com.ishant.passwordmanager.ui.activities.lock_activity.LockActivity
 import com.ishant.passwordmanager.util.Passwords
 import kotlinx.coroutines.*
 
-
 class UpdateLockPasswordFragment : Fragment(R.layout.fragment_update_lock_password) {
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentUpdateLockPasswordBinding.bind(view)
-
         binding.changePasswordScrollView.post {
             binding.changePasswordScrollView.fullScroll(View.FOCUS_DOWN)
         }
-
-
         var cbBruteForce = 0
-
         binding.btnBruteForceHelp.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle("Anti Brute Force Mechanism")
@@ -36,20 +30,14 @@ class UpdateLockPasswordFragment : Fragment(R.layout.fragment_update_lock_passwo
                     d.dismiss()
                 }.create().show()
         }
-
-
         val viewModel = (activity as LockActivity).viewModel
-
         viewModel.getLockPassword().observe(viewLifecycleOwner, Observer { lockPassword ->
-
             binding.btnChangePassword.setOnClickListener {
-
                 val securityClass = EncryptionDecryption()
                 val correctOldPassword = securityClass.decrypt(lockPassword[0].password,lockPassword[0].key,securityClass.getKey())
                 val oldPassword = binding.layoutOldLockPassword.editText?.text.toString()
                 val password = binding.layoutLockPassword.editText?.text.toString()
                 val hint = binding.layoutLockPasswordHint.editText?.text.toString()
-
                 if (oldPassword.isEmpty() || oldPassword.isBlank()) {
                     binding.layoutOldLockPassword.isErrorEnabled = true
                     binding.layoutOldLockPassword.error = "Old Password cannot be blank"
@@ -64,7 +52,6 @@ class UpdateLockPasswordFragment : Fragment(R.layout.fragment_update_lock_passwo
                         } else {
                             cbBruteForce = 0
                         }
-
                         if (password.isBlank() || password.isEmpty()) {
                             binding.layoutLockPassword.error = "Password cannot be blank"
                         } else {
@@ -89,14 +76,8 @@ class UpdateLockPasswordFragment : Fragment(R.layout.fragment_update_lock_passwo
                             }
                         }
                     }
-
                     }
                 }
-
-
             })
-
-
-
     }
 }

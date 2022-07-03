@@ -43,32 +43,21 @@ import java.util.*
 
 
 class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
-
     private lateinit var binding: FragmentEditPasswordBinding
     private lateinit var adapter: PasswordAccountInfoAdapter
-
     lateinit var viewModel: CreateEditViewPasswordViewModel
-
     lateinit var accountDetailList: MutableList<EntryDetail>
-
-
     val args: EditPasswordFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEditPasswordBinding.bind(view)
-
-
-
         val mBottomSheetDialog = RoundedBottomSheetDialog(requireContext())
         val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_options, null)
         mBottomSheetDialog.setContentView(sheetView)
         val sheetBinding: BottomSheetOptionsBinding = BottomSheetOptionsBinding.bind(sheetView)
-
         val data = args.data
-
         binding.entryTitleLayout.editText?.setText(data.title)
-
         when(data.category) {
             "Social" -> binding.chipSocial.isChecked = true
             "Mails" -> binding.chipMail.isChecked = true
@@ -77,40 +66,28 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
             "Other" -> binding.chipOther.isChecked = true
             else -> binding.chipWork.isChecked = true
         }
-
         viewModel = (activity as CreateEditViewPasswordActivity).viewModel
-
-
-
         accountDetailList = mutableListOf<EntryDetail>()
-
         val securityClass = EncryptionDecryption()
-
         val rvAccountDetails = binding.rvAccountDetails
         rvAccountDetails.layoutManager = LinearLayoutManager(requireContext())
-
        CoroutineScope(Dispatchers.IO).launch {
-
            val oldEntryDetailList = viewModel.getAllEntryDetailsOneTime(data.id)
            for(i in 0..oldEntryDetailList.size-1) {
-
                val oldEntryDetailKey = viewModel.getAllEncryptedKeysOneTime(oldEntryDetailList[i].id)[0]
                val decryptedData = securityClass.decrypt(
                    oldEntryDetailList[i].detailContent,
                    oldEntryDetailKey.emdKey,
                    securityClass.getKey()
                )
-
                val decryptedEntryDetail = EntryDetail(oldEntryDetailList[i].id,oldEntryDetailList[i].entryId,oldEntryDetailList[i].detailType,decryptedData)
                accountDetailList.add(decryptedEntryDetail)
            }
-
            withContext(Dispatchers.Main) {
                adapter = PasswordAccountInfoAdapter(accountDetailList)
                rvAccountDetails.adapter = adapter
            }
        }
-
 
         val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,0) {
             override fun onMove(
@@ -124,28 +101,18 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                 adapter.notifyItemMoved(startPos, endPos)
                 return true
             }
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
             }
         })
-
         itemTouchHelper.attachToRecyclerView(binding.rvAccountDetails)
-
-
-
-
         var companyIcon = data.icon
-
         binding.btnBack.setOnClickListener {
             val intent = Intent(requireContext(), PasswordActivity::class.java)
             startActivity(intent)
             (activity as CreateEditViewPasswordActivity).finish()
         }
-
-
         binding.btnIcon.setOnClickListener {
-
             val iBottomSheetDialog = RoundedBottomSheetDialog(requireContext())
             val sheetView = layoutInflater.inflate(R.layout.company_chooser_sheet, null)
             iBottomSheetDialog.setContentView(sheetView)
@@ -163,18 +130,13 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                 Snackbar.make(view, "${it.companyName}'s logo selected", Snackbar.LENGTH_SHORT).show()
                 iBottomSheetDialog.dismiss()
             }
-
             iBottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
             companySheetBinding.searchBar.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
                 }
-
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                     val companyListData = CompanyListData.companyListData
                     val filteredList = mutableListOf<CompanyList>()
-
                     if (p0 != null) {
                         for (company in companyListData) {
                             if (company.companyName.contains(p0)) {
@@ -182,25 +144,18 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                             }
                         }
                     }
-
                     val filteredCompanyAdapter = LogoCompanyChooserAdapter(filteredList)
                     companySheetBinding.rvCompanyChooser.adapter = filteredCompanyAdapter
-
                 }
-
                 override fun afterTextChanged(p0: Editable?) {
-
                 }
             })
-
-
         }
 
         binding.btnNewEntry.setOnClickListener {
             val popupMenu = PopupMenu(requireContext(), it)
             popupMenu.menuInflater.inflate(R.menu.account_details_menu, popupMenu.menu)
             popupMenu.show()
-
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.miUsername -> {
@@ -227,63 +182,42 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                         showBottomSheet(mBottomSheetDialog,sheetBinding,5)
                         popupMenu.dismiss()
                     }
-
-
                 }
                 true
             }
-
         }
 
 
         binding.btnSave.setOnClickListener {
-
             val entryTitle = binding.entryTitleLayout.editText?.text.toString()
-
             val entryCategory: String = (binding.categoryChipGroup.children.toList().filter {
                 (it as Chip).isChecked
             }[0] as Chip).text.toString()
-
             val entryIcon = companyIcon
-
             val entryDetailsList = accountDetailList
-
             if(entryTitle.isNotEmpty() || entryTitle.isNotBlank()) {
                 if(entryCategory.isNotEmpty() || entryCategory.isNotBlank()) {
                     if(entryDetailsList.isNotEmpty()) {
-
                         /* val dialog = SpotsDialog.Builder()
                              .setContext(requireContext())
                              .setMessage("Encrypting and Saving your Details")
                              .setCancelable(false)
-                             .build()
-
+                             .build(
                          dialog.show()*/
-
                         val dialog = ProgressDialog.show(requireContext(), "Saving", "Please wait, we are encrypting and saving all your information", true, false)
                         dialog.show()
-
                         val password1 = Passwords.PASSWORD1
                         val password2 = Passwords.PASSWORD2
-
-
                         CoroutineScope(Dispatchers.IO).launch {
-
                             // Deleting Old Data
-
                             val oldEntryDetailList = viewModel.getAllEntryDetailsOneTime(data.id)
                             for(i in 0..oldEntryDetailList.size-1) {
                                 viewModel.deleteEncryptedKeys(oldEntryDetailList[i].id)
                             }
                             viewModel.deleteEntryDetails(data.id)
-
-
                             // Adding New Data
-
                             val entry = Entry(data.id, entryTitle, entryCategory, entryIcon, data.favourite)
-
                             val id = async { viewModel.upsertEntry(entry) }.await()
-
                             for(entryDetail in entryDetailsList) {
                                 val encryptedObject = securityClass.encrypt(
                                     entryDetail.detailContent,
@@ -292,28 +226,21 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                                 )
                                 val encryptedData = encryptedObject.encryptedData
                                 val emdKey = encryptedObject.key
-
                                 entryDetail.id = 0
                                 entryDetail.entryId = id
                                 entryDetail.detailContent = encryptedData
-
                                 val entryDetailId = async { viewModel.upsertEntryDetail(
                                     entryDetail
                                 ) }.await()
                                 val keyObject = EncryptedKey(0, entryDetailId, emdKey)
                                 async { viewModel.upsertEncryptedKey(keyObject) }.await()
-
-
-
                             }
-
                             withContext(Dispatchers.Main) {
                                 dialog.dismiss()
                                 val intent = Intent(requireContext(), PasswordActivity::class.java)
                                 startActivity(intent)
                                 (activity as CreateEditViewPasswordActivity).finish()
                             }
-
                         }
                     } else {
                         Snackbar.make(
@@ -328,23 +255,17 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
             } else {
                 Snackbar.make(view, "Title cannot be blank", Snackbar.LENGTH_SHORT).show()
             }
-
-
         }
-
     }
 
 
 
 
     private fun showBottomSheet(mBottomSheetDialog: RoundedBottomSheetDialog, sheetBinding: BottomSheetOptionsBinding, optionType: Int) {
-
         var detailType = ""
         var detailContent = ""
-
         sheetBinding.optionInputLayout.editText?.text?.clear()
         sheetBinding.optionInputLayout.editText?.clearFocus()
-
         when (optionType) {
             0 -> {
                 detailType = "Username"
@@ -355,7 +276,6 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
                 detailType = "Email"
                 sheetBinding.optionInputLayout.helperText = "Eg. user@example.com"
                 sheetBinding.optionInputLayout.editText?.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
-
             }
             2 -> {
                 detailType = "Phone Number"
@@ -384,9 +304,7 @@ class EditPasswordFragment : Fragment(R.layout.fragment_edit_password) {
         }
 
         sheetBinding.optionInputLayout.hint = detailType
-
         mBottomSheetDialog.show()
-
         sheetBinding.btnAddOption.setOnClickListener {
             val validateMessage = validateInput(
                 sheetBinding.optionInputLayout.editText?.text.toString(),

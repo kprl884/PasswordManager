@@ -40,6 +40,5 @@ class PasswordAccountInfoAdapter(private val accountDetails: MutableList<EntryDe
             accountDetails.removeAt(holder.adapterPosition)
             notifyDataSetChanged()
         }
-
     }
 }

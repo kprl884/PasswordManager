@@ -1,6 +1,5 @@
 package com.ishant.passwordmanager.ui.activities.lock_activity.fragments
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,18 +13,13 @@ import com.ishant.passwordmanager.ui.activities.lock_activity.LockActivity
 import com.ishant.passwordmanager.ui.activities.password_activity.PasswordActivity
 import kotlinx.coroutines.*
 
-
 class LockPasswordFragment : Fragment(R.layout.fragment_lock_password) {
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewModel = (activity as LockActivity).viewModel
         val binding = FragmentLockPasswordBinding.bind(view)
-
         var incorrectPasswordCount = 0
-
         viewModel.getLockPassword().observe(viewLifecycleOwner, Observer { lockData ->
-
             binding.layoutLockPassword.helperText = "Password Hint: ${lockData[0].hint}"
             binding.btnLoginAccount.setOnClickListener {
                 val securityClass = EncryptionDecryption()
@@ -40,7 +34,6 @@ class LockPasswordFragment : Fragment(R.layout.fragment_lock_password) {
                         (activity as LockActivity).finish()
                     } else {
                         Snackbar.make(view,"Incorrect Password!",Snackbar.LENGTH_SHORT).show()
-
                         if(lockData[0].antiBruteforceEnabled==1) {
                             incorrectPasswordCount += 1
                             if(incorrectPasswordCount>=4) {
@@ -52,7 +45,6 @@ class LockPasswordFragment : Fragment(R.layout.fragment_lock_password) {
                                             binding.tvAntiBruteforceCountdown.text = "Try again after $timer Seconds"
                                             binding.layoutLockPassword.editText?.isEnabled = false
                                             binding.btnLoginAccount.isEnabled = false
-
                                         }
                                         delay(1000)
                                         timer--
@@ -66,14 +58,9 @@ class LockPasswordFragment : Fragment(R.layout.fragment_lock_password) {
                                 }
                             }
                         }
-
                     }
                 }
             }
-
         })
-
-
     }
-
 }

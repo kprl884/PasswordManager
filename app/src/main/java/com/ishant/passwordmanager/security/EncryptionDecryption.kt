@@ -7,13 +7,10 @@ import third.part.android.util.Base64
 
 
 class EncryptionDecryption {
-
     init {
         System.loadLibrary("key-jni")
     }
-
     external fun getKey(): String
-
         fun encrypt(data: String, emdPasswordArg: String, eedKeyArg: String): EncryptedObject {
             val emdSalt = saltString(generateSalt())
             val emdKey = generateKeyFromPassword(emdPasswordArg, emdSalt)
@@ -21,20 +18,13 @@ class EncryptionDecryption {
             val eedEncryptedString = encrypt(emdEncryptedString, keys(eedKeyArg)).toString()
             return EncryptedObject(keyString(emdKey), eedEncryptedString)
         }
-
         fun decrypt(encryptedData: String, emdKeyArg: String, eedKeyArg: String): String {
             val eedDecryptedString = decryptString(CipherTextIvMac(encryptedData), keys(eedKeyArg))
             val emdDecryptedString = decryptString(CipherTextIvMac(eedDecryptedString), keys(emdKeyArg))
             return emdDecryptedString
         }
-
-
     }
-
-
-
 /*
-
         // Variable Names
         // emd: Encrypt Main Data
         // eed: Encrypt Encrypted Data
@@ -71,8 +61,6 @@ class EncryptionDecryption {
         Log.e("IshantEncryption","Encrypted Data String2 (EED): $eedEncryptedString\n")
         Log.e("IshantEncryption","Main Data: $dataToEncrypt\n")
         Log.e("IshantEncryption","Final Decrypted String: $finalDecryptedString\n")
-
-
 */
 
 /*
@@ -88,5 +76,4 @@ class EncryptionDecryption {
         Log.e("IshantEncryption","Key2: $key2\n")
         Log.e("IshantEncryption","Encrypted Data: $encryptedString\n")
         Log.e("IshantEncryption","Decrypted Data: $decryptedString\n")
-
         */

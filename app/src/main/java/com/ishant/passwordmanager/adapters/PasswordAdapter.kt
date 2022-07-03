@@ -1,6 +1,5 @@
 package com.ishant.passwordmanager.adapters
 
-import android.R.attr.*
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -8,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -25,7 +23,6 @@ import com.ishant.passwordmanager.ui.viewmodels.CreateEditViewPasswordViewModel
 import com.ishant.passwordmanager.util.CompanyListData
 import kotlinx.coroutines.*
 
-
 class PasswordAdapter(
     private val mContext: Context,
     private val viewModel: CreateEditViewPasswordViewModel,
@@ -36,12 +33,10 @@ class PasswordAdapter(
     inner class PasswordAdapterViewHolder(val binding: PasswordBinding): RecyclerView.ViewHolder(
         binding.root)
 
-
     private val differCallback = object: DiffUtil.ItemCallback<Entry>() {
         override fun areItemsTheSame(oldItem: Entry, newItem: Entry): Boolean {
             return oldItem.id == newItem.id
         }
-
         override fun areContentsTheSame(oldItem: Entry, newItem: Entry): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
@@ -58,26 +53,16 @@ class PasswordAdapter(
         return differ.currentList.size
     }
 
-
     private var onItemClickListener: ((Entry) -> Unit)? = null
 
-
     override fun onBindViewHolder(holder: PasswordAdapterViewHolder, position: Int) {
-
-
         val entry = differ.currentList[position]
-
         viewModel.getAllEntryDetails(entry.id).observe(owner, Observer { entryDetailList ->
-
-
             holder.binding.tvPasswordTitle.setBackgroundColor(0x00000000)
             holder.binding.tvPasswordInfo.setBackgroundColor(0x00000000)
             holder.binding.ivPasswordIcon.setBackgroundColor(0x00000000)
-
-
             holder.binding.tvPasswordTitle.text = entry.title
             holder.binding.tvPasswordInfo.text = entry.category
-
 
             val iconId = entry.icon
             val iconList = CompanyListData.companyListData
@@ -89,39 +74,28 @@ class PasswordAdapter(
                     holder.binding.ivPasswordIcon.setImageResource(R.drawable.cl_general_account)
                 }
             }
-
-
-
             holder.binding.root.setOnClickListener {
                 onItemClickListener?.let {
                     it(entry)
                 }
             }
-
-
             holder.binding.ivOptions.setOnClickListener {
-
                 val popupMenu = PopupMenu(mContext, it)
                 popupMenu.menuInflater.inflate(R.menu.options_menu, popupMenu.menu)
-
                 if (entry.favourite == 0) {
                     popupMenu.menu.get(2).title = "Add to Favourites"
                 } else {
                     popupMenu.menu.get(2).title = "Remove from Favourites"
                 }
-
                 popupMenu.show()
-
                 popupMenu.setOnMenuItemClickListener { menuItem ->
                     when (menuItem.itemId) {
                         R.id.miEdit -> {
-
                             val intent = Intent(mContext.applicationContext,
                                 CreateEditViewPasswordActivity::class.java)
                             intent.putExtra("command", "edit")
                             intent.putExtra("data", entry)
                             mContext.startActivity(intent)
-
                         }
                         R.id.miDelete -> {
                             AlertDialog.Builder(mContext)
@@ -131,7 +105,6 @@ class PasswordAdapter(
                                     for (entryDetail in entryDetailList) {
                                         viewModel.deleteEncryptedKeys(entryDetail.id)
                                     }
-
                                     viewModel.deleteEntryDetails(entry.id)
                                     viewModel.deleteEntry(entry)
                                     d.dismiss()
@@ -140,20 +113,13 @@ class PasswordAdapter(
                                         " \"${entry.title}\" Deleted Successfully",
                                         Snackbar.LENGTH_SHORT
                                     ).show()
-
-
                                 }.setNegativeButton("No") { d, i ->
                                     d.dismiss()
                                 }.create().show()
-
                         }
                         R.id.miFav -> {
-
                             if (entry.favourite == 0) {
-
-
                                 //viewModel.setFavouriteEntry(1,entry.id)
-
                                 CoroutineScope(Dispatchers.IO).launch {
                                     entry.favourite = 1
                                     async { viewModel.upsertEntry(entry) }.await()
@@ -169,19 +135,13 @@ class PasswordAdapter(
                                         })
                                     }
                                 }
-
                                 /*
                                  viewModel.getAllEntries().observe(owner, Observer { it1 ->
                                     viewModel.sortedList.postValue(it1)
                                 })
                                 activity.binding.navView.setSelection(1)
-
-
                                  */
-
                             } else {
-
-
                                 CoroutineScope(Dispatchers.IO).launch {
                                     entry.favourite = 0
                                     async { viewModel.upsertEntry(entry) }.await()
@@ -198,7 +158,6 @@ class PasswordAdapter(
                                     }
 
                                 }
-
                                 /*   viewModel.setFavouriteEntry(0,entry.id)
                                    Snackbar.make(fragmentView,"Removed from Favourites",Snackbar.LENGTH_SHORT).show()
                                    viewModel.getAllEntries().observe(owner, Observer { it1 ->
@@ -206,7 +165,6 @@ class PasswordAdapter(
                                    })
                                    activity.binding.navView.setSelectionAtPosition(1,true)
                                    */
-
                             }
                         }
                     }
@@ -214,14 +172,10 @@ class PasswordAdapter(
                     true
                 }
             }
-
         })
-
-
     }
 
     fun setOnItemClickListener(listener: (Entry) -> Unit) {
         onItemClickListener = listener
     }
-
 }

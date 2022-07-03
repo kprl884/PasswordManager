@@ -21,14 +21,11 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
         val database = PasswordManagerDatabase(this)
         val repository = PasswordManagerRepository(database)
         val factory = CreateEditViewPasswordViewModelProviderFactory(repository)
         val viewModel = ViewModelProvider(this, factory).get(CreateEditViewPasswordViewModel::class.java)
-
         viewModel.getLockPassword().observe(this, Observer {
             if(it.size==0) {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -47,6 +44,5 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         })
-
     }
 }

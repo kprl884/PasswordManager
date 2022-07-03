@@ -18,21 +18,16 @@ import com.ishant.passwordmanager.util.Passwords.Companion.PASSWORD1
 import kotlinx.coroutines.*
 
 class CreateLockFragment : Fragment(R.layout.fragment_create_lock) {
-
     lateinit var dialog: ProgressDialog
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentCreateLockBinding.bind(view)
-
         binding.btnGetStarted.setOnClickListener {
             val mBottomSheetDialog = RoundedBottomSheetDialog(requireContext())
             val sheetView = layoutInflater.inflate(R.layout.create_lock_bottom_sheet, null)
             mBottomSheetDialog.setContentView(sheetView)
-
             val mBottomSheetBinding = CreateLockBottomSheetBinding.bind(sheetView)
             var cbBruteForce = 0
-
             mBottomSheetBinding.btnBruteForceHelp.setOnClickListener {
                 AlertDialog.Builder(requireContext())
                     .setTitle("Anti Brute Force Mechanism")
@@ -41,20 +36,16 @@ class CreateLockFragment : Fragment(R.layout.fragment_create_lock) {
                         d.dismiss()
                     }.create().show()
             }
-
             mBottomSheetDialog.show()
-
             val viewModel = (activity as LockActivity).viewModel
             mBottomSheetBinding.btnCreateAccount.setOnClickListener {
                 val password = mBottomSheetBinding.layoutLockPassword.editText?.text.toString()
                 val hint = mBottomSheetBinding.layoutLockPasswordHint.editText?.text.toString()
-
                 if(mBottomSheetBinding.cbAntiBruteForce.isChecked) {
                     cbBruteForce = 1
                 } else {
                     cbBruteForce = 0
                 }
-
                 if (password.isBlank() || password.isEmpty()) {
                     mBottomSheetBinding.layoutLockPassword.error = "Password cannot be blank"
                 } else {
@@ -78,7 +69,6 @@ class CreateLockFragment : Fragment(R.layout.fragment_create_lock) {
                                         val password1 = PASSWORD1
                                         val encryptedPasswordObject = securityClass.encrypt(password,password1,securityClass.getKey())
                                         val lock = Lock(0,encryptedPasswordObject.encryptedData,encryptedPasswordObject.key,hint,cbBruteForce)
-
                                                 async { viewModel.setLock(lock) }.await()
                                                 delay(2000)
                                         withContext(Dispatchers.Main) {
@@ -95,11 +85,7 @@ class CreateLockFragment : Fragment(R.layout.fragment_create_lock) {
                     }
                 }
             }
-
         }
     }
-
-
-
 }
 
